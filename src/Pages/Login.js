@@ -6,33 +6,40 @@ import { toast } from 'react-toastify';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8000/login', {
-        username,
-        password,
-      });
+        const response = await axios.post('http://localhost:8000/login', {
+            username,
+            email,
+            password,
+        });
 
-      console.log(response.data);
-      toast.success('Login successful');
-      navigate('/'); // Redirect after successful login
+        console.log(response.data);
+        toast.success('Login successful');
+
+        // Pass user data when navigating to /task1
+        navigate('/task1', { state: { user: response.data.user_data } });
     } catch (error) {
-      console.error('Login failed:', error.response?.data?.detail || error.message);
-      toast.error('Login failed: ' + (error.response?.data?.detail || error.message));
+        console.error('Login failed:', error.response?.data?.detail || error.message);
+        toast.error('Login failed: ' + (error.response?.data?.detail || error.message));
     }
-  };
+};
 
   // Navigate to the signup page
   const handleSignupRedirect = () => {
     navigate('/signup');
   };
+  const handleadminRedirect = () => {
+    navigate('/admin1');
+  };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-gray-600">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
         <form onSubmit={handleSubmit}>
@@ -46,6 +53,19 @@ const Login = () => {
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-gray-700 font-bold mb-2">
+              email
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -77,6 +97,15 @@ const Login = () => {
               className="text-blue-500 hover:underline"
             >
               Sign up
+            </button>
+          </p>
+          <p className="text-gray-700">
+            Loggin as Admin?{' '}
+            <button 
+              onClick={handleadminRedirect} 
+              className="text-blue-500 hover:underline"
+            >
+              Loggin
             </button>
           </p>
         </div>

@@ -1,50 +1,47 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
-import { toast } from 'react-toastify'; // Import toast for notifications
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
-const Signup = () => {
+const Admin = () => {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8000/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
+        const response = await axios.post('http://localhost:8000/adminll', {
+            username,
+            email,
+            password,
+        });
 
-      const data = await response.json();
-      console.log(data);
+        console.log(response.data);
+        toast.success('Login successful');
 
-      if (response.ok) {
-        toast.success('Signup successful!'); // Show success toast
-        console.log('Signup data:', data);
-        navigate('/login'); // Redirect to login page after successful signup
-      } else {
-        toast.error(`Signup failed: ${data.detail}`); // Show error toast
-      }
+        // Pass user data when navigating to /task1
+        navigate('/admin', { state: { user: response.data.user_data } });
     } catch (error) {
-      console.error('Error during signup:', error);
-      toast.error('An error occurred during signup. Please try again later.');
+        console.error('Login failed:', error.response?.data?.detail || error.message);
+        toast.error('Login failed: ' + (error.response?.data?.detail || error.message));
     }
-  };
+};
 
-  // Navigate to the login page
-  const handleLoginRedirect = () => {
+  // Navigate to the signup page
+  const handleSignupRedirect = () => {
+    navigate('/signup');
+  };
+  const handleloginRedirect = () => {
     navigate('/login');
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-600">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Admin Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="username" className="block text-gray-700 font-bold mb-2">
@@ -61,7 +58,7 @@ const Signup = () => {
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 font-bold mb-2">
-              Email
+              email
             </label>
             <input
               type="email"
@@ -89,17 +86,26 @@ const Signup = () => {
             type="submit"
             className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
-            Sign Up
+            Login
           </button>
         </form>
         <div className="mt-4 text-center">
           <p className="text-gray-700">
-            You already have an account?{' '}
+            Not signed up?{' '}
             <button 
-              onClick={handleLoginRedirect} 
+              onClick={handleSignupRedirect} 
               className="text-blue-500 hover:underline"
             >
-              Login
+              Sign up
+            </button>
+          </p>
+          <p className="text-gray-700">
+            Not Logged in?{' '}
+            <button 
+              onClick={handleloginRedirect} 
+              className="text-blue-500 hover:underline"
+            >
+              logggin
             </button>
           </p>
         </div>
@@ -108,4 +114,5 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Admin;
+
